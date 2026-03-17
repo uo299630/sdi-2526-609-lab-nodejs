@@ -1,13 +1,16 @@
 {
-  "name": "music_store",
-  "Description": "Tienda de musica",
-  "Version": "1.0.0",
-  "Dependencies": {},
-  "devDependencies": {
-    "jest": "^29.3.1",
-    "@types/jest": "^29.2.5"
-  },
+  "name": "sdi-2526-609-lab-nodejs",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "test": "jest"
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0",
+    "morgan": "~1.9.1"
   }
 }
