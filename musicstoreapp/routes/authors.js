@@ -7,8 +7,16 @@ module.exports = function (app) {
         { name: 'Autor 5', group: 'Grupo E', rol: 'pianista' }
     ];
 
+    let roles = [
+        'cantante',
+        'trompetista',
+        'violinista',
+        'saxofonista',
+        'pianista'
+    ];
+
     app.get('/authors/add', function (req, res) {
-        res.render('authors/add.twig');
+        res.render('authors/add.twig', { roles: roles });
     });
 
     app.post('/authors/add', function (req, res) {
