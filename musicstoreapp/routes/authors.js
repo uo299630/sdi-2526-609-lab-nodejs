@@ -61,6 +61,14 @@ module.exports = function (app) {
         res.render('authors/authors.twig', { authors: authors });
     });
 
+    app.get('/authors/filter/:rol', function (req, res) {
+        let rol = req.params.rol;
+        let filteredAuthors = authors.filter(function (author) {
+            return author.rol === rol;
+        });
+        res.render('authors/authors.twig', { authors: filteredAuthors });
+    });
+
     app.get('/author*', function (req, res) {
         res.redirect('/authors');
     });
