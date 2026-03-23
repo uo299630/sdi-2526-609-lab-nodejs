@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 let MongoClient = require('mongodb').MongoClient;
+let fileUpload = require('express-fileupload');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -13,6 +14,12 @@ var app = express();
 let bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(fileUpload({
+    limits: { fileSize: 50 * 1024 * 1024 },
+    createParentPath: true
+}));
+app.set('uploadPath', __dirname);
 
 let connectionStrings = 'mongodb://admin:ADMSIS123$@ac-0beetcy-shard-00-00.8hdb8cu.mongodb.net:27017,ac-0beetcy-shard-00-01.8hdb8cu.mongodb.net:27017,ac-0beetcy-shard-00-02.8hdb8cu.mongodb.net:27017/?ssl=true&replicaSet=atlas-bh382k-shard-0&authSource=admin&appName=musicstoreapp';
 let dbClient = new MongoClient(connectionStrings);

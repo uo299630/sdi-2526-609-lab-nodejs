@@ -13,6 +13,7 @@
     "http-errors": "~1.6.3",
     "mongodb": "^7.1.0",
     "morgan": "~1.9.1",
-    "twig": "~0.10.3"
+    "twig": "~0.10.3",
+    "express-fileupload": "^1.5.2"
   }
-}
+  }
