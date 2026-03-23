@@ -1,4 +1,4 @@
-module.exports = function (app,twig) {
+module.exports = function (app, dbClient) {
     // 1. Rutas fijas (Estáticas) - Van PRIMERO
     app.get("/songs", function (req, res) {
         let songs = [{
@@ -25,11 +25,31 @@ module.exports = function (app,twig) {
     });
 
     app.post('/songs/add', function(req, res) {
-        // Al ser GET, usamos req.query para leer los parámetros de la URL
-        let response = "Cancion agregada: " + (req.body.title || "Sin título") + "<br>"
-            + " genero: " + (req.body.kind || "Sin género") + "<br>"
-            + " precio: " + (req.body.price || "0");
-        res.send(response);
+        let song = {
+            title: req.body.title,
+            kind: req.body.kind,
+            price: req.body.price
+        };
+
+        dbClient.connect()
+            .then(function () {
+                let database = dbClient.db('musicStore');
+                let collectionName = 'songs';
+                let songsCollection = database.collection(collectionName);
+                songsCollection.insertOne(song)
+                    .then(function (result) {
+                        res.send('canción añadida id: ' + result.insertedId);
+                    })
+                    .then(function () {
+                        dbClient.close();
+                    })
+                    .catch(function (err) {
+                        res.send('Error al insertar: ' + err);
+                    });
+            })
+            .catch(function (err) {
+                res.send('Error de conexión: ' + err);
+            });
     });
 
     app.get('/add', function(req, res) {
