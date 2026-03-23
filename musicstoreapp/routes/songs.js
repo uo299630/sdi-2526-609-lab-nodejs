@@ -1,4 +1,4 @@
-module.exports = function (app, dbClient) {
+module.exports = function (app, songsRepository) {
     // 1. Rutas fijas (Estáticas) - Van PRIMERO
     app.get("/songs", function (req, res) {
         let songs = [{
@@ -31,25 +31,13 @@ module.exports = function (app, dbClient) {
             price: req.body.price
         };
 
-        dbClient.connect()
-            .then(function () {
-                let database = dbClient.db('musicStore');
-                let collectionName = 'songs';
-                let songsCollection = database.collection(collectionName);
-                songsCollection.insertOne(song)
-                    .then(function (result) {
-                        res.send('canción añadida id: ' + result.insertedId);
-                    })
-                    .then(function () {
-                        dbClient.close();
-                    })
-                    .catch(function (err) {
-                        res.send('Error al insertar: ' + err);
-                    });
-            })
-            .catch(function (err) {
-                res.send('Error de conexión: ' + err);
-            });
+        songsRepository.insertSong(song, function (result) {
+            if (result.songId !== null && result.songId !== undefined) {
+                res.send("Agregada la canción ID: " + result.songId);
+            } else {
+                res.send("Error al insertar canción " + result.error);
+            }
+        });
     });
 
     app.get('/add', function(req, res) {

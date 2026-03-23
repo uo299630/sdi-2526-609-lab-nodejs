@@ -18,7 +18,10 @@ let connectionStrings = 'mongodb://admin:ADMSIS123$@ac-0beetcy-shard-00-00.8hdb8
 let dbClient = new MongoClient(connectionStrings);
 app.set('connectionStrings', connectionStrings);
 
-require("./routes/songs.js")(app, dbClient);
+let songsRepository = require("./repositories/songsRepository.js");
+songsRepository.init(app, dbClient);
+
+require("./routes/songs.js")(app, songsRepository);
 require("./routes/authors.js")(app);
 
 
