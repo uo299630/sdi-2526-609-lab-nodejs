@@ -1,6 +1,6 @@
 const ObjectId = require('mongodb').ObjectId;
 
-module.exports = function (app, songsRepository) {
+module.exports = function (app, songsRepository, commentRepository) {
     // 1. Rutas fijas (Estáticas) - Van PRIMERO
     app.get("/songs", function (req, res) {
         res.redirect("/shop");
@@ -88,7 +88,21 @@ module.exports = function (app, songsRepository) {
         let filter = { _id: new ObjectId(req.params.id) };
         let options = {};
         songsRepository.findSong(filter, options).then(function (song) {
-            res.render("songs/song.twig", { song: song });
+            if (song == null) {
+                res.send("La canción no existe");
+            } else {
+                let commentFilter = { song_id: new ObjectId(req.params.id) };
+                let commentOptions = { sort: { _id: 1 } };
+                commentRepository.getComments(commentFilter, commentOptions).then(function (comments) {
+                    res.render("songs/song.twig", {
+                        song: song,
+                        comments: comments,
+                        user: req.session.user
+                    });
+                }).catch(function (error) {
+                    res.send("Se ha producido un error al listar los comentarios " + error);
+                });
+            }
         }).catch(function (error) {
             res.send("Se ha producido un error al buscar la canción " + error);
         });
