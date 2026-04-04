@@ -38,6 +38,8 @@ app.use("/publications", userSessionRouter);
 app.use("/audios/", userAudiosRouter);
 app.use("/shop/", userSessionRouter);
 app.use("/songs/favorites", userSessionRouter);
+app.use("/songs/buy", userSessionRouter);
+app.use("/purchases", userSessionRouter);
 app.use("/songs/edit", userAuthorRouter);
 app.use("/songs/delete", userAuthorRouter);
 

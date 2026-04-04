@@ -11,9 +11,19 @@ userAudiosRouter.use(function (req, res, next) {
     let filter = { _id: new ObjectId(songId) };
     songsRepository.findSong(filter, {}).then(function (song) {
         if (req.session.user && song && song.author === req.session.user) {
-            next();
+            return next();
         } else {
-            res.redirect("/shop");
+            let purchaseFilter = { user: req.session.user, song_id: new ObjectId(songId) };
+            let options = { projection: { _id: 0, song_id: 1 } };
+            songsRepository.getPurchases(purchaseFilter, options).then(function (purchasedIds) {
+                if (purchasedIds !== null && purchasedIds.length > 0) {
+                    return next();
+                } else {
+                    res.redirect("/shop");
+                }
+            }).catch(function () {
+                res.redirect("/shop");
+            });
         }
     }).catch(function () {
         res.redirect("/shop");
@@ -21,4 +31,3 @@ userAudiosRouter.use(function (req, res, next) {
 });
 
 module.exports = userAudiosRouter;
-
