@@ -12,9 +12,21 @@
             <h2>{{ song.title }}</h2>
             <p>{{ song.author }}</p>
             <p>{{ song.kind }}</p>
-            <form class="form-horizontal" method="post" action="/songs/buy/{{ song._id }}">
-                <button type="submit" class="btn btn-primary pull-right">Comprar: {{ song.price }} €</button>
-            </form>
+            {% if user %}
+                {% if isAuthor or hasBought %}
+                    <audio controls class="pull-right">
+                        <source src="/audios/{{ song._id }}.mp3" type="audio/mpeg">
+                    </audio>
+                {% else %}
+                    <form class="form-horizontal" method="post" action="/songs/buy/{{ song._id }}">
+                        <button type="submit" class="btn btn-primary pull-right">Comprar: {{ song.price }} €</button>
+                    </form>
+                {% endif %}
+            {% else %}
+                <form class="form-horizontal" method="post" action="/songs/buy/{{ song._id }}">
+                    <button type="submit" class="btn btn-primary pull-right">Comprar: {{ song.price }} €</button>
+                </form>
+            {% endif %}
         </div>
     </div>
 </div>

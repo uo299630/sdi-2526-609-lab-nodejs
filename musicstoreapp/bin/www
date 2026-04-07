@@ -20,8 +20,8 @@ app.set('port', port);
  * Create HTTP and HTTPS servers.
  */
 
-var privateKey = fs.readFileSync(__dirname + '/certificates/alice.key', 'utf8');
-var certificate = fs.readFileSync(__dirname + '/certificates/alice.crt', 'utf8');
+var privateKey = fs.readFileSync(__dirname + '/certificates/server.key', 'utf8');
+var certificate = fs.readFileSync(__dirname + '/certificates/server.crt', 'utf8');
 var credentials = { key: privateKey, cert: certificate };
 
 var server = http.createServer(app);
