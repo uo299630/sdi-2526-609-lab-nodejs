@@ -1,0 +1,11 @@
+{
+  "name": "memoryapp",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {},
+  "dependencies": {
+    "express": "^4.18.3",
+    "http-errors": "~1.6.3"
+  }
+}
+
