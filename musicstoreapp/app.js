@@ -8,11 +8,13 @@ let fileUpload = require('express-fileupload');
 let crypto = require('crypto');
 let expressSession = require('express-session');
 let jwt = require('jsonwebtoken');
+let rest = require('request');
 
 var indexRouter = require('./routes/index');
 
 var app = express();
 app.set('jwt', jwt);
+app.set('rest', rest);
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");

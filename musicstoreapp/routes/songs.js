@@ -121,6 +121,33 @@ module.exports = function (app, songsRepository, commentRepository) {
                 if (req.session.user && song.author === req.session.user) {
                     isAuthor = true;
                 }
+                let calculateUsdAndRender = function () {
+                    let restSettings = {
+                        url: "https://api.currencyapi.com/v3/latest?apikey=MITOKEN&base_currency=EUR&currencies=USD",
+                        method: "get"
+                    };
+                    let rest = app.get("rest");
+                    rest(restSettings, function (error, response, body) {
+                        try {
+                            if (!error && response && response.statusCode >= 200 && response.statusCode < 300) {
+                                let responseObject = JSON.parse(body);
+                                if (responseObject && responseObject.data && responseObject.data.USD && responseObject.data.USD.value) {
+                                    let rateUSD = responseObject.data.USD.value;
+                                    let songValue = song.price / rateUSD;
+                                    song.usd = Math.round(songValue * 100) / 100;
+                                }
+                            }
+                        } catch (e) {
+                        }
+                        res.render("songs/song.twig", {
+                            song: song,
+                            comments: res.locals.comments,
+                            user: req.session.user,
+                            isAuthor: isAuthor,
+                            hasBought: hasBought
+                        });
+                    });
+                };
                 if (req.session.user) {
                     let purchaseFilter = {
                         user: req.session.user,
@@ -134,13 +161,8 @@ module.exports = function (app, songsRepository, commentRepository) {
                         let commentFilter = { song_id: new ObjectId(req.params.id) };
                         let commentOptions = { sort: { _id: 1 } };
                         commentRepository.getComments(commentFilter, commentOptions).then(function (comments) {
-                            res.render("songs/song.twig", {
-                                song: song,
-                                comments: comments,
-                                user: req.session.user,
-                                isAuthor: isAuthor,
-                                hasBought: hasBought
-                            });
+                            res.locals.comments = comments;
+                            calculateUsdAndRender();
                         }).catch(function (error) {
                             res.redirect("/error?message=" +
                                 encodeURIComponent("Se ha producido un error al listar los comentarios " + error));
@@ -153,13 +175,8 @@ module.exports = function (app, songsRepository, commentRepository) {
                     let commentFilter = { song_id: new ObjectId(req.params.id) };
                     let commentOptions = { sort: { _id: 1 } };
                     commentRepository.getComments(commentFilter, commentOptions).then(function (comments) {
-                        res.render("songs/song.twig", {
-                            song: song,
-                            comments: comments,
-                            user: req.session.user,
-                            isAuthor: isAuthor,
-                            hasBought: hasBought
-                        });
+                        res.locals.comments = comments;
+                        calculateUsdAndRender();
                     }).catch(function (error) {
                         res.redirect("/error?message=" +
                             encodeURIComponent("Se ha producido un error al listar los comentarios " + error));

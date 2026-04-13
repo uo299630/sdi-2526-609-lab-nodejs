@@ -19,12 +19,16 @@
                     </audio>
                 {% else %}
                     <form class="form-horizontal" method="post" action="/songs/buy/{{ song._id }}">
-                        <button type="submit" class="btn btn-primary pull-right">Comprar: {{ song.price }} €</button>
+                        <button type="submit" class="btn btn-primary pull-right">
+                            Comprar: {{ song.price }} €{% if song.usd is defined %} - {{ song.usd }} ${% endif %}
+                        </button>
                     </form>
                 {% endif %}
             {% else %}
                 <form class="form-horizontal" method="post" action="/songs/buy/{{ song._id }}">
-                    <button type="submit" class="btn btn-primary pull-right">Comprar: {{ song.price }} €</button>
+                    <button type="submit" class="btn btn-primary pull-right">
+                        Comprar: {{ song.price }} €{% if song.usd is defined %} - {{ song.usd }} ${% endif %}
+                    </button>
                 </form>
             {% endif %}
         </div>
