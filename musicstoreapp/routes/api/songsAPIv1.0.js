@@ -32,6 +32,37 @@ module.exports = function (app, songsRepository, usersRepository) {
         }
     });
 
+    /**
+     * @swagger
+     * /api/v1.0/songs:
+     *   get:
+     *     summary: Obtener lista de canciones
+     *     description: Retorna todas las canciones almacenadas en el sistema.
+     *     tags:
+     *       - Songs
+     *     responses:
+     *       200:
+     *         description: Lista de canciones obtenida correctamente.
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 songs:
+     *                   type: array
+     *                   items:
+     *                     $ref: '#/components/schemas/Song'
+     *       500:
+     *         description: Error interno del servidor al recuperar las canciones.
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 error:
+     *                   type: string
+     *                   example: Se ha producido un error al recuperar las canciones.
+     */
     app.get("/api/v1.0/songs", function (req, res) {
         let filter = {};
         let options = {};
@@ -74,6 +105,29 @@ module.exports = function (app, songsRepository, usersRepository) {
         }
     });
 
+    /**
+     * @swagger
+     * /api/v1.0/songs/{id}:
+     *   delete:
+     *     summary: Eliminar una canción
+     *     description: Elimina una canción del sistema a partir de su identificador.
+     *     tags:
+     *       - Songs
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         description: Identificador único de la canción.
+     *         schema:
+     *           type: string
+     *     responses:
+     *       200:
+     *         description: Canción eliminada correctamente.
+     *       404:
+     *         description: ID inválido o canción no encontrada.
+     *       500:
+     *         description: Error interno del servidor.
+     */
     app.delete("/api/v1.0/songs/:id", function (req, res) {
         try {
             let songId = new ObjectId(req.params.id);
@@ -92,6 +146,53 @@ module.exports = function (app, songsRepository, usersRepository) {
         }
     });
 
+    /**
+     * @swagger
+     * /api/v1.0/songs:
+     *   post:
+     *     summary: Crear una nueva canción
+     *     description: Añade una nueva canción al sistema.
+     *     tags:
+     *       - Songs
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/SongRequest'
+     *     responses:
+     *       201:
+     *         description: Canción creada correctamente.
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: Canción añadida correctamente.
+     *                 _id:
+     *                   type: string
+     *       409:
+     *         description: Conflicto, la canción ya existe.
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 error:
+     *                   type: string
+     *                   example: No se ha podido crear la canción. El recurso ya existe.
+     *       500:
+     *         description: Error interno del servidor.
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 error:
+     *                   type: string
+     */
     app.post("/api/v1.0/songs", function (req, res) {
         try {
             let song = {
@@ -115,6 +216,37 @@ module.exports = function (app, songsRepository, usersRepository) {
         }
     });
 
+    /**
+     * @swagger
+     * /api/v1.0/songs/{id}:
+     *   put:
+     *     summary: Modificar una canción
+     *     description: Actualiza los datos de una canción existente mediante su identificador.
+     *     tags:
+     *       - Songs
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         description: Identificador único de la canción.
+     *         schema:
+     *           type: string
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/SongRequest'
+     *     responses:
+     *       200:
+     *         description: Canción modificada correctamente.
+     *       404:
+     *         description: ID inválido o canción no encontrada.
+     *       409:
+     *         description: No se ha realizado ninguna modificación.
+     *       500:
+     *         description: Error interno del servidor.
+     */
     app.put("/api/v1.0/songs/:id", function (req, res) {
         try {
             let songId = new ObjectId(req.params.id);

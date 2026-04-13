@@ -9,12 +9,43 @@ let crypto = require('crypto');
 let expressSession = require('express-session');
 let jwt = require('jsonwebtoken');
 let rest = require('request');
+let swaggerUi = require('swagger-ui-express');
+let swaggerJsdoc = require('swagger-jsdoc');
+let { Song } = require('./schemas/song.schema');
+let { SongRequest } = require('./schemas/songRequest.schema');
 
 var indexRouter = require('./routes/index');
+
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'API de la tienda de música de SDI',
+      version: '1.0.0',
+      description: 'Documentación interactiva de la API'
+    },
+    components: {
+      schemas: {
+        Song,
+        SongRequest
+      }
+    },
+    servers: [
+      {
+        url: 'http://localhost:8081',
+        description: 'Servidor de pruebas de la aplicación'
+      }
+    ]
+  },
+  apis: ['./routes/api/*.js']
+};
+
+const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
 var app = express();
 app.set('jwt', jwt);
 app.set('rest', rest);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
