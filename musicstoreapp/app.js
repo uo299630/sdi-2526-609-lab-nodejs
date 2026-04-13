@@ -7,10 +7,12 @@ let MongoClient = require('mongodb').MongoClient;
 let fileUpload = require('express-fileupload');
 let crypto = require('crypto');
 let expressSession = require('express-session');
+let jwt = require('jsonwebtoken');
 
 var indexRouter = require('./routes/index');
 
 var app = express();
+app.set('jwt', jwt);
 
 let bodyParser = require('body-parser');
 app.use(bodyParser.json());
@@ -33,6 +35,7 @@ app.use(expressSession({
 const userSessionRouter = require('./routes/userSessionRouter');
 const userAudiosRouter = require('./routes/userAudiosRouter');
 const userAuthorRouter = require('./routes/userAuthorRouter');
+const userTokenRouter = require('./routes/userTokenRouter');
 app.use("/songs/add", userSessionRouter);
 app.use("/publications", userSessionRouter);
 app.use("/audios/", userAudiosRouter);
@@ -42,6 +45,7 @@ app.use("/songs/buy", userSessionRouter);
 app.use("/purchases", userSessionRouter);
 app.use("/songs/edit", userAuthorRouter);
 app.use("/songs/delete", userAuthorRouter);
+app.use("/api/v1.0/songs/", userTokenRouter);
 
 let connectionStrings = 'mongodb://admin:ADMSIS123$@ac-0beetcy-shard-00-00.8hdb8cu.mongodb.net:27017,ac-0beetcy-shard-00-01.8hdb8cu.mongodb.net:27017,ac-0beetcy-shard-00-02.8hdb8cu.mongodb.net:27017/?ssl=true&replicaSet=atlas-bh382k-shard-0&authSource=admin&appName=musicstoreapp';
 let dbClient = new MongoClient(connectionStrings);
@@ -62,7 +66,7 @@ commentRepository.init(app, dbClient);
 require("./routes/songs/favorites.js")(app, songsRepository, favoriteSongsRepository);
 require("./routes/comments.js")(app, commentRepository);
 require("./routes/songs.js")(app, songsRepository, commentRepository);
-require("./routes/api/songsAPIv1.0.js")(app, songsRepository);
+require("./routes/api/songsAPIv1.0.js")(app, songsRepository, usersRepository);
 require("./routes/authors.js")(app);
 require("./routes/users.js")(app, usersRepository);
 
