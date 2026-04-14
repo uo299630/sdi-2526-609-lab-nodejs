@@ -128,21 +128,30 @@ module.exports = function (app, songsRepository, usersRepository) {
      *       500:
      *         description: Error interno del servidor.
      */
-    app.delete("/api/v1.0/songs/:id", function (req, res) {
+    app.delete("/api/v1.0/songs/:id", async function (req, res) {
         try {
-            let songId = new ObjectId(req.params.id);
+            let songId;
+            try {
+                songId = new ObjectId(req.params.id);
+            } catch (e) {
+                return res.status(400).json({ error: "ID inválido." });
+            }
             let filter = { _id: songId };
-            songsRepository.deleteSong(filter, {}).then(result => {
-                if (result === null || result.deletedCount === 0) {
-                    res.status(404).json({ error: "ID inválido o no existe, no se ha borrado el registro." });
-                } else {
-                    res.status(200).json(result);
-                }
-            }).catch(error => {
-                res.status(500).json({ error: "Se ha producido un error: " + error.message });
-            });
+            const song = await songsRepository.findSong(filter, {});
+            if (song === null) {
+                return res.status(404).json({ error: "ID inválido o no existe, no se ha borrado el registro." });
+            }
+            if (!res.user || song.author !== res.user) {
+                return res.status(403).json({ error: "No tiene permisos para eliminar esta canción." });
+            }
+            const result = await songsRepository.deleteSong(filter, {});
+            if (result === null || result.deletedCount === 0) {
+                res.status(404).json({ error: "No se ha podido eliminar el registro." });
+            } else {
+                res.status(200).json(result);
+            }
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).json({ error: "Se ha producido un error: " + error.message });
         }
     });
 
@@ -195,10 +204,30 @@ module.exports = function (app, songsRepository, usersRepository) {
      */
     app.post("/api/v1.0/songs", function (req, res) {
         try {
+            const errors = [];
+            const title = req.body.title;
+            const kind = req.body.kind;
+            const priceRaw = req.body.price;
+            if (!title || typeof title !== "string" || title.trim().length < 3 || title.trim().length > 40) {
+                errors.push("El título debe tener entre 3 y 40 caracteres.");
+            }
+            if (!kind || typeof kind !== "string" || kind.trim().length < 3 || kind.trim().length > 30) {
+                errors.push("El género debe tener entre 3 y 30 caracteres.");
+            }
+            const price = parseFloat(priceRaw);
+            if (isNaN(price) || price <= 0) {
+                errors.push("El precio debe ser un número positivo.");
+            }
+            if (errors.length > 0) {
+                return res.status(400).json({ error: errors.join(" ") });
+            }
+            if (!res.user) {
+                return res.status(403).json({ error: "Usuario no autorizado." });
+            }
             let song = {
-                title: req.body.title,
-                kind: req.body.kind,
-                price: req.body.price,
+                title: title.trim(),
+                kind: kind.trim(),
+                price: price,
                 author: res.user
             };
             songsRepository.insertSong(song, function (result) {
@@ -247,37 +276,73 @@ module.exports = function (app, songsRepository, usersRepository) {
      *       500:
      *         description: Error interno del servidor.
      */
-    app.put("/api/v1.0/songs/:id", function (req, res) {
+    app.put("/api/v1.0/songs/:id", async function (req, res) {
         try {
-            let songId = new ObjectId(req.params.id);
+            let songId;
+            try {
+                songId = new ObjectId(req.params.id);
+            } catch (e) {
+                return res.status(400).json({ error: "ID inválido." });
+            }
             let filter = { _id: songId };
+            const existingSong = await songsRepository.findSong(filter, {});
+            if (existingSong === null) {
+                return res.status(404).json({ error: "ID inválido o no existe, no se ha actualizado la canción." });
+            }
+            if (!res.user || existingSong.author !== res.user) {
+                return res.status(403).json({ error: "No tiene permisos para modificar esta canción." });
+            }
             const options = { upsert: false };
             let song = {
                 author: res.user
             };
-            if (typeof req.body.title !== "undefined" && req.body.title !== null) {
-                song.title = req.body.title;
-            }
-            if (typeof req.body.kind !== "undefined" && req.body.kind !== null) {
-                song.kind = req.body.kind;
-            }
-            if (typeof req.body.price !== "undefined" && req.body.price !== null) {
-                song.price = req.body.price;
-            }
-            songsRepository.updateSong(song, filter, options).then(result => {
-                if (result === null) {
-                    res.status(404).json({ error: "ID inválido o no existe, no se ha actualizado la canción." });
-                } else if (result.modifiedCount === 0) {
-                    res.status(409).json({ error: "No se ha modificado ninguna canción." });
+            const errors = [];
+            let hasChanges = false;
+            if (typeof req.body.title !== "undefined") {
+                const title = req.body.title;
+                if (!title || typeof title !== "string" || title.trim().length < 3 || title.trim().length > 40) {
+                    errors.push("El título debe tener entre 3 y 40 caracteres.");
                 } else {
-                    res.status(200).json({
-                        message: "Canción modificada correctamente.",
-                        result: result
-                    });
+                    song.title = title.trim();
+                    hasChanges = true;
                 }
-            }).catch(error => {
-                res.status(500).json({ error: "Se ha producido un error al modificar la canción: " + error.message });
-            });
+            }
+            if (typeof req.body.kind !== "undefined") {
+                const kind = req.body.kind;
+                if (!kind || typeof kind !== "string" || kind.trim().length < 3 || kind.trim().length > 30) {
+                    errors.push("El género debe tener entre 3 y 30 caracteres.");
+                } else {
+                    song.kind = kind.trim();
+                    hasChanges = true;
+                }
+            }
+            if (typeof req.body.price !== "undefined") {
+                const priceRaw = req.body.price;
+                const price = parseFloat(priceRaw);
+                if (isNaN(price) || price <= 0) {
+                    errors.push("El precio debe ser un número positivo.");
+                } else {
+                    song.price = price;
+                    hasChanges = true;
+                }
+            }
+            if (!hasChanges) {
+                return res.status(400).json({ error: "No se han enviado campos válidos para modificar." });
+            }
+            if (errors.length > 0) {
+                return res.status(400).json({ error: errors.join(" ") });
+            }
+            const result = await songsRepository.updateSong(song, filter, options);
+            if (result === null) {
+                res.status(404).json({ error: "ID inválido o no existe, no se ha actualizado la canción." });
+            } else if (result.modifiedCount === 0) {
+                res.status(409).json({ error: "No se ha modificado ninguna canción." });
+            } else {
+                res.status(200).json({
+                    message: "Canción modificada correctamente.",
+                    result: result
+                });
+            }
         } catch (error) {
             res.status(500).json({ error: "Se ha producido un error al intentar modificar la canción: " + error.message });
         }

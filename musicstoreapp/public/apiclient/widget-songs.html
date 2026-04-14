@@ -94,8 +94,13 @@
                 console.log("Canción eliminada: " + _id);
                 $("#" + _id).remove();
             },
-            error: function () {
-                $("#main-container").load("widget-login.html");
+            error: function (error) {
+                if (error.responseJSON && error.responseJSON.error && (error.status === 400 || error.status === 403 || error.status === 404)) {
+                    $("#widget-songs")
+                        .prepend("<div class='alert alert-danger'>" + error.responseJSON.error + "</div>");
+                } else {
+                    $("#main-container").load("widget-login.html");
+                }
             }
         });
     }

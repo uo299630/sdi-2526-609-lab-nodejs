@@ -42,9 +42,13 @@
                 $("#main-container").load("widget-songs.html");
             },
             error: function (error) {
-                $("#main-container").load("widget-login.html");
+                if (error.responseJSON && error.responseJSON.error && error.status === 400) {
+                    $("#widget-agregar")
+                        .prepend("<div class='alert alert-danger'>" + error.responseJSON.error + "</div>");
+                } else {
+                    $("#main-container").load("widget-login.html");
+                }
             }
         });
     }
 </script>
-
