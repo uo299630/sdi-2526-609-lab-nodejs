@@ -23,6 +23,7 @@
         <div class="collapse navbar-collapse" id="myNavbar">
             <ul class="nav navbar-nav" id="barra-menu">
                 <li><a onclick="widgetSongs()">Canciones</a></li>
+                <li><a onclick="widgetExternal()">Buscar externas</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right" id="barra-menu-derecha">
             </ul>
@@ -37,6 +38,9 @@
     function widgetSongs() {
         $("#main-container").load("widget-songs.html");
     }
+    function widgetExternal() {
+        $("#main-container").load("widget-search.html");
+    }
     if (Cookies.get('token') != null) {
         token = Cookies.get('token');
         $("#main-container").load("widget-songs.html");
@@ -47,6 +51,9 @@
         }
         if (w == "songs") {
             $("#main-container").load("widget-songs.html");
+        }
+        if (w == "external") {
+            $("#main-container").load("widget-search.html");
         }
     } else {
         $("#main-container").load("widget-login.html");

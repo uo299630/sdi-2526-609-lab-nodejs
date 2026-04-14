@@ -1,0 +1,51 @@
+<div id="widget-search">
+    <div class="form-group">
+        <input type="text" class="form-control" id="search-term" placeholder="Buscar canciones externas">
+    </div>
+    <button class="btn btn-primary" id="btn-search">Buscar</button>
+    <table class="table table-hover" style="margin-top: 15px;">
+        <thead>
+        <tr>
+            <th>Título</th>
+            <th>Artista</th>
+            <th>Álbum</th>
+            <th class="col-md-1"></th>
+        </tr>
+        </thead>
+        <tbody id="externalSongsBody"></tbody>
+    </table>
+</div>
+<script>
+    window.history.pushState("", "", "/apiclient/client.html?w=external");
+    function updateExternalSongs(songs) {
+        $("#externalSongsBody").empty();
+        for (var i = 0; i < songs.length; i++) {
+            var previewLink = songs[i].previewUrl ? "<a href='" + songs[i].previewUrl + "' target='_blank'>Escuchar</a>" : "";
+            $("#externalSongsBody").append(
+                "<tr>" +
+                "<td>" + songs[i].title + "</td>" +
+                "<td>" + songs[i].artist + "</td>" +
+                "<td>" + songs[i].album + "</td>" +
+                "<td>" + previewLink + "</td>" +
+                "</tr>"
+            );
+        }
+    }
+    $("#btn-search").click(function () {
+        var term = $("#search-term").val();
+        $.ajax({
+            url: URLbase + "/search",
+            type: "GET",
+            data: { term: term },
+            dataType: "json",
+            success: function (response) {
+                updateExternalSongs(response.songs);
+            },
+            error: function () {
+                $("#widget-search")
+                    .prepend("<div class='alert alert-danger'>Se ha producido un error al buscar canciones externas.</div>");
+            }
+        });
+    });
+</script>
+

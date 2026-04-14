@@ -32,6 +32,40 @@ module.exports = function (app, songsRepository, usersRepository) {
         }
     });
 
+    app.get("/api/v1.0/search", function (req, res) {
+        const termRaw = req.query.term;
+        if (!termRaw || typeof termRaw !== "string" || termRaw.trim().length === 0) {
+            return res.status(400).json({ error: "Debe proporcionar un parámetro de búsqueda válido." });
+        }
+        const term = encodeURIComponent(termRaw.trim());
+        const url = "https://itunes.apple.com/search?media=music&entity=song&limit=10&term=" + term;
+        const settings = {
+            url: url,
+            method: "get"
+        };
+        const rest = app.get("rest");
+        rest(settings, function (error, response, body) {
+            if (error || !response) {
+                return res.status(500).json({ error: "Se ha producido un error al llamar al servicio externo." });
+            }
+            try {
+                const data = JSON.parse(body);
+                const results = Array.isArray(data.results) ? data.results : [];
+                const songs = results.map(function (item) {
+                    return {
+                        title: item.trackName,
+                        artist: item.artistName,
+                        album: item.collectionName,
+                        previewUrl: item.previewUrl
+                    };
+                });
+                res.status(200).json({ songs: songs });
+            } catch (e) {
+                res.status(500).json({ error: "Se ha producido un error al procesar la respuesta del servicio externo." });
+            }
+        });
+    });
+
     /**
      * @swagger
      * /api/v1.0/songs:

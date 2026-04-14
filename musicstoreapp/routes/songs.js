@@ -123,7 +123,7 @@ module.exports = function (app, songsRepository, commentRepository) {
                 }
                 let calculateUsdAndRender = function () {
                     let restSettings = {
-                        url: "https://api.currencyapi.com/v3/latest?apikey=MITOKEN&base_currency=EUR&currencies=USD",
+                        url: "https://api.currencyapi.com/v3/latest?apikey=cur_live_iNQtH8rhoLMrS6vlaKfMlchCpflH1bpS17IfJWPJ&base_currency=EUR&currencies=USD",
                         method: "get"
                     };
                     let rest = app.get("rest");
