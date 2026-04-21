@@ -1,0 +1,76 @@
+.song-form-container {
+  background-color: #e6e6e6;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  width: 22rem;
+  margin: 1rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.song-form-container h2 {
+  text-align: center;
+  margin: 0;
+  color: #333;
+  font-size: 1.4rem;
+}
+
+.song-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.song-form input {
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 0.0625rem solid #ccc;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.song-form input:focus {
+  outline: none;
+  border-color: #888;
+}
+
+.song-form input.input-error {
+  border-color: #e74c3c;
+  background-color: #fff6f6;
+}
+
+.field-error {
+  color: #e74c3c;
+  font-size: 0.8rem;
+  padding-left: 0.25rem;
+}
+
+.song-form button {
+  padding: 0.65rem;
+  border: none;
+  border-radius: 0.5rem;
+  background-color: #444;
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+  margin-top: 0.25rem;
+}
+
+.song-form button:hover:not(:disabled) {
+  background-color: #222;
+}
+
+.song-form button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}

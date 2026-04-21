@@ -2,7 +2,7 @@ import { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CardComponent from "../components/CardComponent";
-import AddSongForm from "./AddSongForm";
+import SongForm from "./SongForm";
 import SongDetails from "./SongDetails";
 import "../assets/MainPage.css";
 
@@ -30,7 +30,7 @@ const MainPage = () => {
           />
         )}
         {view === "add" && (
-          <AddSongForm onSongAdded={() => setView("songs")} />
+          <SongForm onSongAdded={() => setView("songs")} />
         )}
       </main>
       <Footer />
