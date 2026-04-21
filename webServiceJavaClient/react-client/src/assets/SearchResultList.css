@@ -1,0 +1,12 @@
+.search-result-list {
+  display: flex;
+  flex-direction: column;
+  max-width: 50rem;
+  margin: 0 auto;
+}
+
+.search-status {
+  text-align: center;
+  color: #666;
+  margin: 2rem 0;
+}

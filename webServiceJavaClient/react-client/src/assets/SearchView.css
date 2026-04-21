@@ -1,0 +1,10 @@
+.search-view {
+  padding: 2rem;
+  min-height: 80vh;
+}
+
+.search-view h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #111;
+}

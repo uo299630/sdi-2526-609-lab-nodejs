@@ -7,6 +7,7 @@ const Header = ({ onChangeView }) => {
       <nav className="nav">
         <button onClick={() => onChangeView("songs")}>Tienda</button>
         <button onClick={() => onChangeView("add")}>Añadir canción</button>
+        <button onClick={() => onChangeView("search")}>Buscar en iTunes</button>
         <button
           onClick={() => {
             localStorage.removeItem("token");

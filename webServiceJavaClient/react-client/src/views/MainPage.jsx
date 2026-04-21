@@ -4,6 +4,7 @@ import Footer from "../components/Footer";
 import CardComponent from "../components/CardComponent";
 import SongForm from "./SongForm";
 import SongDetails from "./SongDetails";
+import SearchView from "./SearchView";
 import "../assets/MainPage.css";
 
 const MainPage = () => {
@@ -32,6 +33,7 @@ const MainPage = () => {
         {view === "add" && (
           <SongForm onSongAdded={() => setView("songs")} />
         )}
+        {view === "search" && <SearchView />}
       </main>
       <Footer />
     </div>
